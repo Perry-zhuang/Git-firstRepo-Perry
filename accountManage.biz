@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<MCITransaction trxName="accountManage" trxCode="accountManage">
+	<datas>
+		<refData access="private" refId="errorCode"/>
+		<refData access="private" refId="errorMsg"/>
+		<refData access="private" refId="serviceId"/>
+		<refData access="private" refId="hostResult"/>
+		<refData access="private" refId="accountNo"/>
+		<refData access="private" refId="BranchNumber"/>
+		<refData access="private" refId="accountPassword"/>
+		<refData access="private" refId="accountName"/>
+		<refData access="private" refId="openDate"/>
+		<refData access="private" refId="accountRate"/>
+		<refData access="private" refId="accountType"/>
+		<refData access="private" refId="accountBalance"/>
+		<refData access="private" refId="CurrencyCode"/>
+		<refData access="private" refId="freezeBalance"/>
+		<refData access="private" refId="Description"/>
+	</datas>
+	<document/>
+	<services/>
+	<formats>
+		<format id="headReqFmt">
+			<document>请求报文头</document>
+			<datas packageType="VariousStringFormat">
+				<refData stringType="FixedLenFormat" len="4" aligment="right" delimChar="#" refId="serviceId" padChar="0" nullCheck="true"/>
+			</datas>
+		</format>
+		<format id="headRepFmt">
+			<document>接收报文头</document>
+			<datas packageType="VariousStringFormat">
+				<refData stringType="FixedLenFormat" len="4" aligment="right" delimChar="#" refId="serviceId" padChar="0" nullCheck="true"/>
+				<refData stringType="FixedLenFormat" len="1" aligment="none" delimChar="#" refId="hostResult" nullCheck="true"/>
+			</datas>
+		</format>
+		<operation id="queryAccount" name="查询帐户信息">
+			<document/>
+			<flow name="flow1" x="10" height="400" width="500" y="10">
+				<StartAction name="StartAction0" x="100" height="40" width="100" y="50">
+					<transition name="transition0" dest="SetValueAction0"/>
+				</StartAction>
+				<EndAction name="EndAction0" x="100" height="40" width="100" y="350"/>
+				<TcpIpAccessAction name="TcpIpAccessAction0" width="100" sendHeadFormatName="headReqFmt" sendFormatName="queryAccount" serviceName="tcpipservice0" y="231" x="109" receiveFormatName="queryAccount" height="40" receiveHeadFormatName="headRepFmt">
+					<transition name="transition2" dest="EndAction0"/>
+				</TcpIpAccessAction>
+				<SetValueAction name="SetValueAction0" x="115" height="40" dataName="serviceId" width="100" dataValue="0718" y="141">
+					<transition name="transition1" dest="TcpIpAccessAction0"/>
+				</SetValueAction>
+			</flow>
+			<input>
+				<refData refId="accountNo"/>
+			</input>
+			<output/>
+			<datas codeSet="ASCII" packageType="ISO8583">
+				<refData refId="accountNo" IOType="O"/>
+				<refData refId="BranchNumber" IOType="O"/>
+				<refData refId="accountPassword" IOType="O"/>
+				<refData refId="accountName" IOType="O"/>
+				<refData refId="openDate" IOType="O"/>
+				<refData refId="accountRate" IOType="O"/>
+				<refData refId="accountType" IOType="O"/>
+				<refData refId="accountBalance" IOType="O"/>
+				<refData refId="CurrencyCode" IOType="O"/>
+				<refData refId="freezeBalance" IOType="O"/>
+				<refData refId="Description" IOType="O"/>
+			</datas>
+		</operation>
+	</formats>
+</MCITransaction>
