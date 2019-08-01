@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.platform.tk.dao.DemandDao">
+    <resultMap type="com.platform.tk.entity.DemandEntity" id="demandMap">
+        <result property="id" column="id"/>
+        <result property="demandCode" column="demand_code"/>
+        <result property="name" column="name"/>
+        <result property="productId" column="product_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="isMain" column="is_main"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="teamId" column="team_id"/>
+        <result property="teamName" column="team_name"/>
+        <result property="proMgrId" column="pro_mgr_id"/>
+        <result property="proMgrName" column="pro_mgr_name"/>
+        <result property="level" column="level"/>
+        <result property="devType" column="dev_type"/>
+        <result property="demandType" column="demand_type"/>
+        <result property="mgrType" column="mgr_type"/>
+        <result property="isMajor" column="is_major"/>
+        <result property="isDispute" column="is_dispute"/>
+        <result property="windowId" column="window_id"/>
+        <result property="windowName" column="window_name"/>
+        <result property="expectSize" column="expect_size"/>
+        <result property="realSize" column="real_size"/>
+        <result property="assistAppIds" column="assist_app_ids"/>
+        <result property="stepId" column="step_id"/>
+        <result property="isRisk" column="is_risk"/>
+        <result property="riskDescribe" column="risk_describe"/>
+        <result property="solveMethod" column="solve_method"/>
+        <result property="putDeptId" column="put_dept_id"/>
+        <result property="putDeptName" column="put_dept_name"/>
+        <result property="putUserId" column="put_user_id"/>
+        <result property="putUserName" column="put_user_name"/>
+        <result property="analyseUserId" column="analyse_user_id"/>
+        <result property="analyseUserName" column="analyse_user_name"/>
+        <result property="acceptStatus" column="accept_status"/>
+        <result property="acceptTime" column="accept_time"/>
+        <result property="demandDescribe" column="demand_describe"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastUpdateTime" column="last_update_time"/>
+        <result property="createUserId" column="create_user_id"/>
+        <result property="remarks" column="remarks"/>
+       
+    </resultMap>
+    
+    <!-- excel 导出表格结果处理 -->
+	<resultMap type="com.platform.tk.entity.DemandEntity" id="export" extends="demandMap">
+	 <!-- 协办应用  -->
+       
+ 		<collection property="appsEntity" ofType="com.platform.cm.entity.AppsEntity">
+        <id column="a_id" property="id"/>
+        <result column="a_name" property="name"/>
+        </collection> 
+        <!-- 一个需求对应多条日志 -->
+        <collection property="demandLogEntity" ofType="com.platform.tk.entity.DemandLogEntity">
+        <id column="l_id" property="id"/>
+        <result column="l_followup_time" property="followupTime"/>
+        <result column="l_followup_title" property="followupTitle"/>
+        <result column="l_followup_desc" property="followupDesc"/>
+		<result column="l_demand_id" property="demandId"/>
+		<result column="l_followup_user_id" property="followupUserId"/>
+		<!-- 一个跟进人Id 对应一个跟进人 -->
+		<association property="sysUserEntity" javaType="com.platform.entity.SysUserEntity">
+		<id column="u_user_id" property="userId"/>
+		<result column="u_username" property="username"/>
+		<result column="relname" property="relname"/> 
+		</association>
+        </collection>
+	
+	</resultMap>
+	
+	<!-- 需求列表按照最近跟新降序的处理结合 -->
+	<resultMap type="com.platform.tk.entity.DemandEntity" id = "queryListByTime" extends="demandMap">
+	        <!-- 一个需求对应多条日志 -->
+        <collection property="demandLogEntity" ofType="com.platform.tk.entity.DemandLogEntity">
+       <!--  <id column="id" property="id"/> -->
+        <result column="l_followup_time" property="followupTime"/>
+		<result column="l_demand_id" property="demandId"/>
+
+        </collection>
+	</resultMap>
+	
+
+	<select id="queryObject" resultType="com.platform.tk.entity.DemandEntity">
+		select
+			`id`,
+			`demand_code`,
+			`name`,
+			`product_id`,
+			`parent_id`,
+			`is_main`,
+			`dept_id`,
+			`dept_name`,
+			`team_id`,
+			`team_name`,
+			`pro_mgr_id`,
+			`pro_mgr_name`,
+			`level`,
+			`dev_type`,
+			`demand_type`,
+			`mgr_type`,
+			`is_major`,
+			`is_dispute`,
+			`window_id`,
+			`window_name`,
+			`expect_size`,
+			`real_size`,
+			`assist_app_ids`,
+			`step_id`,
+			`is_risk`,
+			`risk_describe`,
+			`solve_method`,
+			`put_dept_id`,
+			`put_dept_name`,
+			`put_user_id`,
+			`put_user_name`,
+			`analyse_user_id`,
+			`analyse_user_name`,
+			`accept_status`,
+			`accept_time`,
+			`demand_describe`,
+			`create_time`,
+			`last_update_time`,
+			`create_user_id`,
+			`remarks`
+		from ynt_tk_demand
+		where id = #{id}
+	</select>
+
+	<select id="queryList" resultMap="queryListByTime">
+		SELECT
+    		d.`id`,
+    		d.`demand_code`,
+    		d.`name`,
+    		d.`product_id`,
+    		d.`parent_id`,
+    		d.`is_main`,
+    		d.`dept_id`,
+    		d.`dept_name`,
+    		d.`team_id`,
+    		d.`team_name`,
+    		d.`pro_mgr_id`,
+    		d.`pro_mgr_name`,
+    		d.`level`,
+    		d.`dev_type`,
+    		d.`demand_type`,
+    		d.`mgr_type`,
+    		d.`is_major`,
+    		d.`is_dispute`,
+    		d.`window_id`,
+    		d.`window_name`,
+    		d.`expect_size`,
+    		d.`real_size`,
+    		d.`assist_app_ids`,
+    		d.`step_id`,
+    		d.`is_risk`,
+    		d.`risk_describe`,
+    		d.`solve_method`,
+    		d.`put_dept_id`,
+    		d.`put_dept_name`,
+    		d.`put_user_id`,
+    		d.`put_user_name`,
+    		d.`analyse_user_id`,
+    		d.`analyse_user_name`,
+    		d.`accept_status`,
+    		d.`accept_time`,
+    		d.`demand_describe`,
+    		d.`create_time`,
+    		d.`last_update_time`,
+    		d.`create_user_id`,
+    		d.`remarks`,
+    		lo.l_followup_time,
+    		lo.l_demand_id
+		FROM ynt_tk_demand d
+		LEFT JOIN (SELECT DISTINCT MAX(`followup_time`) l_followup_time ,`demand_id` l_demand_id FROM ynt_tk_demand_log  GROUP  BY  `demand_id`  DESC ) lo ON lo.l_demand_id  = d.id
+		WHERE 1=1
+		<!--  数据过滤  -->
+        ${filterSql} 
+		<if test="name != null and name.trim() != ''">
+			AND d.name LIKE concat('%',#{name},'%')
+		</if>
+		<if test="isMajor != null and isMajor.trim() != ''">
+			AND d.is_major = #{isMajor}
+		</if>
+		<if test="isRisk != null and isRisk.trim() != ''">
+			AND d.is_risk = #{isRisk}
+		</if>
+		<if test="isDispute != null and isDispute.trim() != ''">
+			AND d.is_dispute = #{isDispute}
+		</if>
+		<if test="acceptStatus != null and acceptStatus.trim() != ''">
+			AND d.accept_status = #{acceptStatus}
+		</if>
+		<if test="analyseUserId != null and analyseUserId.trim() != ''">
+			AND d.analyse_user_id = #{analyseUserId}
+		</if>
+		<if test="teamId != null and teamId.trim() != ''">
+			AND d.team_id = #{teamId}
+		</if>
+		<if test="windowId !=null and windowId.trim() != ''">
+		AND d.window_id = #{windowId}
+		</if> 
+		
+		<if test="demandType != null and demandType.trim() != '' ">
+		AND d.demand_type = #{demandType}
+		</if>
+			
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+				ORDER  BY  lo.l_followup_time DESC
+               <!--  order by id desc -->
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int" >
+		select count(*) from ynt_tk_demand
+		WHERE 1=1
+		<!--  数据过滤  -->
+        ${filterSql} 
+        <if test="name != null and name.trim() != ''">
+            AND name LIKE concat('%',#{name},'%')
+        </if>
+        <if test="isMajor != null and isMajor != ''">
+			AND is_major = #{isMajor}
+		</if>
+		<if test="isRisk != null and isRisk != ''">
+			AND is_risk = #{isRisk}
+		</if>
+		<if test="isDispute != null and isDispute != ''">
+			AND is_dispute = #{isDispute}
+		</if>
+		<if test="acceptStatus != null and acceptStatus != ''">
+			AND accept_status = #{acceptStatus}
+		</if>
+		<if test="analyseUserId != null and analyseUserId != ''">
+			AND analyse_user_id = #{analyseUserId}
+		</if>
+		<if test="teamId != null and teamId != ''">
+			AND team_id = #{teamId}
+		</if>
+	</select>
+	 
+	<insert id="save" parameterType="com.platform.tk.entity.DemandEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into ynt_tk_demand(
+			`demand_code`,
+			`name`,
+			`product_id`,
+			`parent_id`,
+			`is_main`,
+			`dept_id`,
+			`dept_name`,
+			`team_id`,
+			`team_name`,
+			`pro_mgr_id`,
+			`pro_mgr_name`,
+			`level`,
+			`dev_type`,
+			`demand_type`,
+			`mgr_type`,
+			`is_major`,
+			`is_dispute`,
+			`window_id`,
+			`window_name`,
+			`expect_size`,
+			`real_size`,
+			`assist_app_ids`,
+			`step_id`,
+			`is_risk`,
+			`risk_describe`,
+			`solve_method`,
+			`put_dept_id`,
+			`put_dept_name`,
+			`put_user_id`,
+			`put_user_name`,
+			`analyse_user_id`,
+			`analyse_user_name`,
+			`accept_status`,
+			`accept_time`,
+			`demand_describe`,
+			`create_time`,
+			`last_update_time`,
+			`create_user_id`,
+			`remarks`)
+		values(
+			#{demandCode},
+			#{name},
+			#{productId},
+			#{parentId},
+			#{isMain},
+			#{deptId},
+			#{deptName},
+			#{teamId},
+			#{teamName},
+			#{proMgrId},
+			#{proMgrName},
+			#{level},
+			#{devType},
+			#{demandType},
+			#{mgrType},
+			#{isMajor},
+			#{isDispute},
+			#{windowId},
+			#{windowName},
+			#{expectSize},
+			#{realSize},
+			#{assistAppIds},
+			#{stepId},
+			#{isRisk},
+			#{riskDescribe},
+			#{solveMethod},
+			#{putDeptId},
+			#{putDeptName},
+			#{putUserId},
+			#{putUserName},
+			#{analyseUserId},
+			#{analyseUserName},
+			#{acceptStatus},
+			#{acceptTime},
+			#{demandDescribe},
+			#{createTime},
+			#{lastUpdateTime},
+			#{createUserId},
+			#{remarks})
+	</insert>
+	 
+	<update id="update" parameterType="com.platform.tk.entity.DemandEntity">
+		update ynt_tk_demand 
+		<set>
+			<if test="demandCode != null">`demand_code` = #{demandCode}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="productId != null">`product_id` = #{productId}, </if>
+			<if test="parentId != null">`parent_id` = #{parentId}, </if>
+			<if test="isMain != null">`is_main` = #{isMain}, </if>
+			<if test="deptId != null">`dept_id` = #{deptId}, </if>
+			<if test="deptName != null">`dept_name` = #{deptName}, </if>
+			<if test="teamId != null">`team_id` = #{teamId}, </if>
+			<if test="teamName != null">`team_name` = #{teamName}, </if>
+			<if test="proMgrId != null">`pro_mgr_id` = #{proMgrId}, </if>
+			<if test="proMgrName != null">`pro_mgr_name` = #{proMgrName}, </if>
+			<if test="level != null">`level` = #{level}, </if>
+			<if test="devType != null">`dev_type` = #{devType}, </if>
+			<if test="demandType != null">`demand_type` = #{demandType}, </if>
+			<if test="mgrType != null">`mgr_type` = #{mgrType}, </if>
+			<if test="isMajor != null">`is_major` = #{isMajor}, </if>
+			<if test="isDispute != null">`is_dispute` = #{isDispute}, </if>
+			<if test="windowId != null">`window_id` = #{windowId}, </if>
+			<if test="windowName != null">`window_name` = #{windowName}, </if>
+			<if test="expectSize != null">`expect_size` = #{expectSize}, </if>
+			<if test="realSize != null">`real_size` = #{realSize}, </if>
+			<if test="assistAppIds != null">`assist_app_ids` = #{assistAppIds}, </if>
+			<if test="stepId != null">`step_id` = #{stepId}, </if>
+			<if test="isRisk != null">`is_risk` = #{isRisk}, </if>
+			<if test="riskDescribe != null">`risk_describe` = #{riskDescribe}, </if>
+			<if test="solveMethod != null">`solve_method` = #{solveMethod}, </if>
+			<if test="putDeptId != null">`put_dept_id` = #{putDeptId}, </if>
+			<if test="putDeptName != null">`put_dept_name` = #{putDeptName}, </if>
+			<if test="putUserId != null">`put_user_id` = #{putUserId}, </if>
+			<if test="putUserName != null">`put_user_name` = #{putUserName}, </if>
+			<if test="analyseUserId != null">`analyse_user_id` = #{analyseUserId}, </if>
+			<if test="analyseUserName != null">`analyse_user_name` = #{analyseUserName}, </if>
+			<if test="acceptStatus != null">`accept_status` = #{acceptStatus}, </if>
+			<if test="acceptTime != null">`accept_time` = #{acceptTime}, </if>
+			<if test="demandDescribe != null">`demand_describe` = #{demandDescribe}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="lastUpdateTime != null">`last_update_time` = #{lastUpdateTime}, </if>
+			<if test="createUserId != null">`create_user_id` = #{createUserId}, </if>
+			<if test="remarks != null">`remarks` = #{remarks}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from ynt_tk_demand where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from ynt_tk_demand where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+
+	<!-- 需求列表导出 -->
+	<select id="selectBatch" resultMap="export">
+	SELECT
+    		d.`id`,
+    		d.`demand_code`,
+    		d.`name`,
+    		d.`product_id`,
+    		d.`parent_id`,
+    		d.`is_main`,
+    		d.`dept_id`,
+    		d.`dept_name`,
+    		d.`team_id`,
+    		d.`team_name`,
+    		d.`pro_mgr_id`,
+    		d.`pro_mgr_name`,
+    		d.`level`,
+    		d.`dev_type`,
+    		d.`demand_type`,
+    		d.`mgr_type`,
+    		d.`is_major`,
+    		d.`is_dispute`,
+    		d.`window_id`,
+    		d.`window_name`,
+    		d.`expect_size`,
+    		d.`real_size`,
+    		d.`assist_app_ids`,
+    		d.`step_id`,
+    		d.`is_risk`,
+    		d.`risk_describe`,
+    		d.`solve_method`,
+    		d.`put_dept_id`,
+    		d.`put_dept_name`,
+    		d.`put_user_id`,
+    		d.`put_user_name`,
+    		d.`analyse_user_id`,
+    		d.`analyse_user_name`,
+    		d.`accept_status`,
+    		d.`accept_time`,
+    		d.`demand_describe`,
+    		d.`create_time`,
+    		d.`last_update_time`,
+    		d.`create_user_id`,
+    		d.`remarks`,
+    		l.`demand_id`,
+    		l.`followup_time` l_followup_time,
+    		l.`followup_title` l_followup_title,
+    		l.`followup_desc`l_followup_title,
+    		l.`followup_user_id`l_followup_title,
+    		u.`user_id` u_user_id,
+    		u.`username` u_username,
+    		u.`relname` 
+    		
+    
+    		FROM ynt_tk_demand d  LEFT  JOIN ynt_tk_demand_log l 
+		 	ON d.`id` = l.`demand_id` LEFT JOIN  sys_user u ON  u.`user_id` = l.`followup_user_id` 
+		  WHERE  d.id IN 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</select>
+	
+	<select id="queryAll" resultType="com.platform.tk.entity.DemandEntity">
+	select
+			`id`,
+			`demand_code`,
+			`name`,
+			`product_id`,
+			`parent_id`,
+			`is_main`,
+			`dept_id`,
+			`dept_name`,
+			`team_id`,
+			`team_name`,
+			`pro_mgr_id`,
+			`pro_mgr_name`,
+			`level`,
+			`dev_type`,
+			`demand_type`,
+			`mgr_type`,
+			`is_major`,
+			`is_dispute`,
+			`window_id`,
+			`window_name`,
+			`expect_size`,
+			`real_size`,
+			`assist_app_ids`,
+			`step_id`,
+			`is_risk`,
+			`risk_describe`,
+			`solve_method`,
+			`put_dept_id`,
+			`put_dept_name`,
+			`put_user_id`,
+			`put_user_name`,
+			`analyse_user_id`,
+			`analyse_user_name`,
+			`accept_status`,
+			`accept_time`,
+			`demand_describe`,
+			`create_time`,
+			`last_update_time`,
+			`create_user_id`,
+			`remarks`
+		from ynt_tk_demand
+	</select>
+	
+	<!-- 查询版本 -->
+<!-- <select id="queryWindow" parameterType="com.platform.cm.entity.OnlineWindowsEntity" resultType="com.platform.cm.entity.OnlineWindowsEntity">
+		SELECT id, NAME,VERSION,online_date,create_user_id,create_time,dept_id,remark FROM ynt_cm_online_windows
+	</select>  -->
+	
+
+	
+	
+</mapper>
